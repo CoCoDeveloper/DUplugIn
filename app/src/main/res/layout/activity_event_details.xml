@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:context="com.cocodev.TheDuChronicle.Event_details">
+
+    <ImageView
+        android:id="@+id/event_detail_image"
+        android:layout_width="match_parent"
+        android:layout_height="220dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/event_place_holder"/>
+    <TextView
+        android:id="@+id/event_detail_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:textStyle="bold"
+        android:background="@drawable/rectange_background"
+        android:textSize="24sp"
+        tools:text="Wetland Pool Party Festival"
+       />
+    <TextView
+        android:id="@+id/event_detail_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@mipmap/calendar"
+        android:background="@drawable/rectange_grey_backgroud"
+        tools:text="Sun,2 Jul at 2PM"
+        android:paddingTop="16dp"
+        android:paddingLeft="8dp"
+        android:paddingBottom="16dp"
+        android:textSize="16sp"
+        android:drawablePadding="8dp"
+        />
+    <TextView
+        android:id="@+id/event_detail_place"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rectange_grey_backgroud"
+        tools:text="The Royal Plaza"
+        android:paddingTop="16dp"
+        android:paddingStart="8dp"
+        android:drawableStart="@mipmap/place"
+        android:paddingBottom="16dp"
+        android:textSize="18sp"
+        android:drawablePadding="8dp"
+        />
+    <TextView
+        android:id="@+id/event_detail_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:textSize="18sp"
+        android:text="Description Starts from here"
+        />
+
+
+</LinearLayout>
+</ScrollView>

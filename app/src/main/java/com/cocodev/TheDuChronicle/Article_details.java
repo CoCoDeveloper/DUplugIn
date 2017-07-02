@@ -96,6 +96,5 @@ public class Article_details extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-    }
+}
 }
