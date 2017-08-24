@@ -3,14 +3,19 @@ package com.cocodev.university.delhi.duplugin;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.text.Spanned;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cocodev.university.delhi.duplugin.Utility.ImagePagerAdapter;
+import com.cocodev.university.delhi.duplugin.Utility.ImageViewTouchViewPager;
 import com.cocodev.university.delhi.duplugin.Utility.Notice;
 import com.cocodev.university.delhi.duplugin.Utility.TouchImageView;
 import com.google.firebase.database.DataSnapshot;
@@ -25,27 +30,40 @@ import static com.cocodev.university.delhi.duplugin.Utility.Utility.getTimeAgo;
 public class NoticeDetails extends AppCompatActivity {
     public static final String key = "notice_uid";
     String noticeUid;
-
-
-
+    private LinearLayout dotsLayout;
+    private ImagePagerAdapter noticeImagePagerAdapter;
+    private ImageViewTouchViewPager noticeImagePager;
+    private TextView[] dots;
+    private int[] resources;
     boolean check=true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notice_details);
-        initActionBar();
-        Intent intent = getIntent();
 
+        initActionBar();
+
+        Intent intent = getIntent();
         noticeUid = intent.getStringExtra(key);
+
+        resources = new int[]{R.drawable.placeholder,R.drawable.event_place_holder};
+
+
+        noticeImagePager = (ImageViewTouchViewPager) findViewById(R.id.view_pager);
+        dotsLayout = (LinearLayout) findViewById(R.id.layoutDots);
+        noticeImagePagerAdapter = new ImagePagerAdapter(getApplicationContext(),resources);
+        noticeImagePager.setAdapter(noticeImagePagerAdapter);
+        noticeImagePager.setOnPageChangeListener(viewPagerPageChangeListener);
+        addBottomDots(0);
 
         final TextView title = (TextView) findViewById(R.id.notice_details_title);
         final TextView description = (TextView) findViewById(R.id.notice_details_description);
         final TextView time = (TextView) findViewById(R.id.notice_deatails_time);
         final TextView deadline = (TextView) findViewById(R.id.notice_details_deadline);
         final TextView uid = (TextView) findViewById(R.id.notice_uid);
-        final TouchImageView touchImageViewSmall = (TouchImageView) findViewById(R.id.noticeDetails_smallImageView);
-
+//        final TouchImageView touchImageViewSmall = (TouchImageView) findViewById(R.id.noticeDetails_smallImageView);
+//        touchImageViewSmall.setImageResource(R.drawable.event_place_holder);
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Notices")
                 .child(noticeUid);
         DatabaseReference reference2 = FirebaseDatabase.getInstance().getReference()
@@ -73,7 +91,7 @@ public class NoticeDetails extends AppCompatActivity {
                 time.setText(fromHtml(getTimeAgo(NoticeDetails.this,notice.getTime())));
                 deadline.setText(getTimeAgo(NoticeDetails.this,notice.getDeadline()));
                 if(!notice.getImageUrl().equals("")) {
-                    Picasso.with(NoticeDetails.this).load(notice.getImageUrl()).fit().into(touchImageViewSmall);
+                    //Picasso.with(NoticeDetails.this).load(notice.getImageUrl()).fit().into(touchImageViewSmall);
                 }
             }
 
@@ -86,6 +104,25 @@ public class NoticeDetails extends AppCompatActivity {
         reference2.addListenerForSingleValueEvent(valueEventListener);
 
     }
+    private void addBottomDots(int currentPage) {
+        dots = new TextView[resources.length];
+
+        int[] colorsActive = getResources().getIntArray(R.array.dot_active);
+        int[] colorsInactive = getResources().getIntArray(R.array.dot_inactive);
+
+        dotsLayout.removeAllViews();
+        for (int i = 0; i < dots.length; i++) {
+            dots[i] = new TextView(this);
+            dots[i].setText(Html.fromHtml("&#8226;"));
+            dots[i].setTextSize(35);
+            dots[i].setTextColor(colorsInactive[currentPage]);
+            dotsLayout.addView(dots[i]);
+        }
+
+        if (dots.length > 0)
+            dots[currentPage].setTextColor(colorsActive[currentPage]);
+    }
+
 
     private void initActionBar() {
         ActionBar actionBar = getSupportActionBar();
@@ -115,6 +152,37 @@ public class NoticeDetails extends AppCompatActivity {
 
         }
     }
+
+    ViewPager.OnPageChangeListener viewPagerPageChangeListener = new ViewPager.OnPageChangeListener() {
+
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            addBottomDots(position);
+
+            // changing the next button text 'NEXT' / 'GOT IT'
+            if (position == resources.length - 1) {
+                // last page. make button text to GOT IT
+
+            } else {
+                // still pages are left
+
+            }
+        }
+        @Override
+        public void onPageScrollStateChanged(int state) {
+
+        }
+        private int getItem(int i) {
+            return noticeImagePager.getCurrentItem()+i;
+        }
+    };
+
+
 
     @SuppressWarnings("deprecation")
     public static Spanned fromHtml(String html){
