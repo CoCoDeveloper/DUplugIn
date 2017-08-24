@@ -58,21 +58,36 @@
             android:textSize="12sp"
             android:textStyle="bold" />
 
-        <com.cocodev.university.delhi.duplugin.Utility.TouchImageView
-            android:id="@+id/noticeDetails_smallImageView"
+        <!--<com.cocodev.university.delhi.duplugin.Utility.TouchImageView-->
+            <!--android:id="@+id/noticeDetails_smallImageView"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_below="@id/view_notice_details_time"-->
+
+            <!--/>-->
+        <com.cocodev.university.delhi.duplugin.Utility.ImageViewTouchViewPager
+            android:id="@+id/view_pager"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-
             android:layout_below="@id/view_notice_details_time"
+            android:layout_height="240dp" />
 
-            />
+        <LinearLayout
+            android:id="@+id/layoutDots"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_below="@id/view_pager"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="30dp"
+            android:gravity="center"
+            android:orientation="horizontal">
 
+        </LinearLayout>
         <TextView
             android:id="@+id/notice_details_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignStart="@+id/view_notice_details_time"
-            android:layout_below="@id/noticeDetails_smallImageView"
+            android:layout_below="@id/layoutDots"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginTop="4dp"
