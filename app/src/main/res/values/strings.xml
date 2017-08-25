@@ -58,6 +58,8 @@
     <string name="sp_menuButton">sp_menuButton</string>
     <string name="sp_detailButton">sp_detailButton</string>
 
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>

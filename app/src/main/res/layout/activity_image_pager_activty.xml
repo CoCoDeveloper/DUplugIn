@@ -7,11 +7,11 @@
     android:orientation="vertical"
     tools:context="com.cocodev.university.delhi.duplugin.ImagePagerActivty">
 
-    <com.cocodev.university.delhi.duplugin.Utility.ImageViewTouch
-        android:id="@+id/detail_image_activity"
+    <com.cocodev.university.delhi.duplugin.Utility.CustomViewPager
+        android:id="@+id/imagePagerActivity_viewPager"
         android:layout_width="match_parent"
-        android:scaleType="centerCrop"
-        android:layout_height="wrap_content"
-        android:src="@color/colorAccent" />
+        android:layout_height="match_parent">
+
+    </com.cocodev.university.delhi.duplugin.Utility.CustomViewPager>
 
 </LinearLayout>

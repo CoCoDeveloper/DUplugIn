@@ -44,7 +44,8 @@
             android:layout_height="2dp"
             android:background="#c0c0c0"
             android:layout_below="@id/notice_deatails_time"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="12dp"
+
             />
 
         <TextView
@@ -56,7 +57,7 @@
             android:text="Nupur Joshi"
             android:textAllCaps="true"
             android:textSize="12sp"
-            android:textStyle="bold" />
+            android:textColor="@android:color/holo_red_light" />
 
         <!--<com.cocodev.university.delhi.duplugin.Utility.TouchImageView-->
             <!--android:id="@+id/noticeDetails_smallImageView"-->
@@ -65,19 +66,21 @@
             <!--android:layout_below="@id/view_notice_details_time"-->
 
             <!--/>-->
-        <com.cocodev.university.delhi.duplugin.Utility.ImageViewTouchViewPager
-            android:id="@+id/view_pager"
+
+        <com.cocodev.university.delhi.duplugin.Utility.CustomViewPager
+            android:id="@+id/noticeDetails_viewFlipper"
             android:layout_width="match_parent"
+            android:layout_height="300dp"
             android:layout_below="@id/view_notice_details_time"
-            android:layout_height="240dp" />
+            android:layout_marginTop="4dp" />
 
         <LinearLayout
             android:id="@+id/layoutDots"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_below="@id/view_pager"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="30dp"
+            android:layout_height="50dp"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/noticeDetails_viewFlipper"
+            android:layout_marginTop="10dp"
             android:gravity="center"
             android:orientation="horizontal">
 

@@ -22,6 +22,7 @@
 
 
     <android.support.v7.widget.AppCompatImageButton
+
         android:id="@+id/shareArticle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -29,9 +30,7 @@
         android:layout_alignParentTop="true"
         android:layout_margin="20dp"
         android:background="?android:attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusableInTouchMode="true"
-        android:padding="8dp"
+        android:padding="40dp"
         app:srcCompat="?android:attr/actionModeShareDrawable" />
 
     <TextView
@@ -114,7 +113,7 @@
         android:elevation="8dp"
         android:text="Show Comments"
         android:textColor="@color/colorPrimary"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/articleDetails_postComment"
@@ -124,9 +123,9 @@
         android:layout_alignParentEnd="true"
         android:layout_margin="20dp"
         android:clickable="true"
-        android:visibility="gone"
         app:fabSize="mini"
-        app:srcCompat="@android:drawable/ic_menu_edit" />
+        app:srcCompat="@android:drawable/ic_menu_edit"
+        android:visibility="gone"/>
 
     <EditText
         android:id="@+id/articleDetails_comment_EditText"
@@ -141,13 +140,13 @@
         android:visibility="gone"/>
 
     <Button
+        android:id="@+id/articleDetails_submitComment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/articleDetails_submitComment"
         android:layout_below="@id/articleDetails_comment_EditText"
-        android:textColor="@color/black"
         android:text="Post Comment"
-        android:visibility="gone"/>
+        android:textColor="@color/black"
+        android:visibility="gone" />
 </RelativeLayout>
 
 

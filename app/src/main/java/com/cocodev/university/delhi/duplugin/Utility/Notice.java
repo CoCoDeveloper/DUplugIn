@@ -1,5 +1,7 @@
 package com.cocodev.university.delhi.duplugin.Utility;
 
+import java.util.ArrayList;
+
 /**
  * Created by Sudarshan on 16-06-2017.
  */
@@ -12,27 +14,19 @@ public class Notice {
     private long deadline;
     private String description;
     private String title;
-    private String imageUrl;
+    private ArrayList<String> imageUrls;
     public Notice(){
         //default constructor
     }
 
-    public Notice(String title,String department, long time, long deadline, String description,String imageUrl) {
+    public Notice(String title,String department, long time, long deadline, String description,ArrayList<String> imageUrls) {
         //this.department = department;
         this.title = title;
         this.time = time;
         this.deadline = deadline;
         this.description = description;
-        this.imageUrl = imageUrl;
+        this.imageUrls = imageUrls;
     }
-
-//    public String getDepartment() {
-//        return department;
-//    }
-//
-//    public void setDepartment(String department) {
-//        this.department = department;
-//    }
 
 
     public String getTitle() {
@@ -75,11 +69,11 @@ public class Notice {
         this.uid = uid;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public ArrayList<String> getImageUrls() {
+        return imageUrls;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setImageUrls(ArrayList<String> imageUrls) {
+        this.imageUrls = imageUrls;
     }
 }

@@ -11,6 +11,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatImageButton;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
@@ -155,19 +156,19 @@ public class ArticleDetails extends AppCompatActivity{
         final EditText comment = (EditText) headerView.findViewById(R.id.articleDetails_comment_EditText);
         final Button submitComment = (Button) headerView.findViewById(R.id.articleDetails_submitComment);
         emptyFooterView = LayoutInflater.from(ArticleDetails.this).inflate(R.layout.empty_view,null);
-
+//
 //        toggleShowHideComments.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
-//
+//                Toast.makeText(ArticleDetails.this,Integer.toString(mListView.getSelectedItemPosition()), Toast.LENGTH_SHORT).show();
 //                if(writeComment.getVisibility()==View.GONE) {
 //                    writeComment.setVisibility(View.VISIBLE);
 //                    toggleShowHideComments.setText("Hide Comments");
 //                    mListView.setAdapter(commentAdapter);
-//
 //                    if(commentAdapter.getCount()==0){
 //                        mListView.addFooterView(emptyFooterView);
 //                    }
+//
 //                }else{
 //
 //                    comment.setVisibility(View.GONE);
@@ -180,7 +181,6 @@ public class ArticleDetails extends AppCompatActivity{
 //                }
 //            }
 //        });
-
 
         commentAdapter.registerDataSetObserver(new DataSetObserver() {
             @Override
@@ -249,6 +249,13 @@ public class ArticleDetails extends AppCompatActivity{
             }
         });
 
+        AppCompatImageButton appCompatImageButton = (AppCompatImageButton) findViewById(R.id.shareArticle);
+        appCompatImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(ArticleDetails.this, "clicked", Toast.LENGTH_SHORT).show();
+            }
+        });
 
     }
 

@@ -42,7 +42,8 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".events_details" />
         <activity android:name=".NoticeDetails" />
-        <activity android:name=".ImagePagerActivty"></activity>
+        <activity android:name=".ImagePagerActivty"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
