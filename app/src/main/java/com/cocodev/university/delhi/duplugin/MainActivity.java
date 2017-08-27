@@ -8,8 +8,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Point;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NotificationCompat;
@@ -34,6 +36,10 @@ import com.cocodev.university.delhi.duplugin.articles.ArticleHolder;
 import com.cocodev.university.delhi.duplugin.notices.Notices;
 import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.targets.Target;
+import com.google.android.gms.appinvite.AppInvite;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -41,6 +47,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
+import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -48,7 +56,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener {
     private String LAST_SYNC_ARTICLE= "lastSyncTime";
     private final int REQUEST_CODE_SETTINGS_ACTIVITY = 1001;
     String[] submenus = {"Events","Articles","Notices"};
@@ -63,11 +71,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static final String TAG = "check";
     DatabaseReference databaseReference;
 
+    private GoogleApiClient mGoogleApiClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Normal app init code...
+
+
+
+        checkDynamicLink();
         setContentView(R.layout.activity_main);
+
 
         setNotifications();
 
@@ -152,6 +167,53 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             PreferenceManager.getDefaultSharedPreferences(MainActivity.this).edit().putBoolean(getString(R.string.sp_detailButton),false).commit();
         }
 
+    }
+
+    private void checkDynamicLink() {
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        Uri data = intent.getData();
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this,this)
+                .addApi(AppInvite.API)
+                .build();
+
+
+    }
+
+    @Override
+    protected void onStart() {
+        FirebaseDynamicLinks.getInstance()
+                .getDynamicLink(getIntent())
+                .addOnSuccessListener(new OnSuccessListener<PendingDynamicLinkData>() {
+                    Uri deepLink;
+                    @Override
+                    public void onSuccess(PendingDynamicLinkData pendingDynamicLinkData) {
+                        if(pendingDynamicLinkData!=null){
+
+                            deepLink = pendingDynamicLinkData.getLink();
+                            String type = deepLink.getQueryParameter(getString(R.string.DYNAMIC_LINK_TYPE));
+                            String uid = deepLink.getQueryParameter(getString(R.string.DYNAMIC_LINK_UID));
+                            if(type.equals("article")){
+                                Intent intent = new Intent(MainActivity.this,ArticleDetails.class);
+                                intent.putExtra(ArticleDetails.key,uid);
+                                if(uid!=null) {
+                                    startActivity(intent);
+                                }
+                            }else if(type.equals("events")){
+                                Intent intent = new Intent(MainActivity.this,events_details.class);
+                                intent.putExtra(events_details.key,uid);
+                                if(uid!=null) {
+                                    startActivity(intent);
+                                }
+
+                            }
+                        }
+                    }
+                });
+
+        super.onStart();
     }
 
     private void showToolbarShowcaseView() {
@@ -546,4 +608,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getSharedPreferences(MainActivity.this.getLocalClassName(), Context.MODE_PRIVATE).edit().putString(LAST_SYNC_ARTICLE,databaseReference.push().getKey()).commit();
     }
 
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
 }

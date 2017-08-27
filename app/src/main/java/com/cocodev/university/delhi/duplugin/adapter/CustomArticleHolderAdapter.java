@@ -57,8 +57,8 @@ public abstract class CustomArticleHolderAdapter<T> extends RefListAdapter<T> {
         public final ImageView imageView;
 
         public ViewHolder(View view) {
-            titleView = (TextView) view.findViewById(R.id.notice_details_title);
-            timeView = (TextView) view.findViewById(R.id.notice_deatails_time);
+            titleView = (TextView) view.findViewById(R.id.noticeDetails_title);
+            timeView = (TextView) view.findViewById(R.id.noticeDetails_time);
             authorView = (TextView) view.findViewById(R.id.article_author);
             UID = (TextView) view.findViewById(R.id.article_UID);
             imageView = (ImageView) view.findViewById(R.id.articleImage);

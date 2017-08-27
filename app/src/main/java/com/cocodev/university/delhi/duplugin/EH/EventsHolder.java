@@ -2,17 +2,22 @@ package com.cocodev.university.delhi.duplugin.EH;
 
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.Pair;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -22,6 +27,8 @@ import com.cocodev.university.delhi.duplugin.SA;
 import com.cocodev.university.delhi.duplugin.Utility.Event;
 import com.cocodev.university.delhi.duplugin.Utility.RefListAdapterQuery;
 import com.cocodev.university.delhi.duplugin.events_details;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -29,8 +36,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.dynamiclinks.DynamicLink;
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
+import com.google.firebase.dynamiclinks.ShortDynamicLink;
 import com.squareup.picasso.Picasso;
 
+import static com.cocodev.university.delhi.duplugin.Utility.Utility.formatDate;
 import static com.cocodev.university.delhi.duplugin.Utility.Utility.getTimeAgo;
 
 /**
@@ -196,6 +207,9 @@ public class EventsHolder extends Fragment {
                     final TextView time  = (TextView) v.findViewById(R.id.event_time);
                     final TextView UID  = (TextView) v.findViewById(R.id.event_UID);
                     final ImageView imageView = (ImageView) v.findViewById(R.id.event_image);
+                    final ImageButton imageButton = (ImageButton) v.findViewById(R.id.event_shareButton);
+
+
                     DatabaseReference dbref = firebaseDatabase.getReference().child("Events")
                             .child(model);
                     DatabaseReference dbref2 = firebaseDatabase.getReference()
@@ -203,21 +217,61 @@ public class EventsHolder extends Fragment {
                             .child(PreferenceManager.getDefaultSharedPreferences(getContext()).getString(SA.KEY_COLLEGE,""))
                             .child("Events")
                             .child(model);
+
                     dbref2.keepSynced(true);
                     ValueEventListener valueEventListener = new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            Event event = dataSnapshot.getValue(Event.class);
+                            final Event event = dataSnapshot.getValue(Event.class);
                             if(event==null)
                                 return;
                             time.setText(getTimeAgo(getContext(),event.getDate()));
                             venue.setText(event.getVenue());
                             title.setText(event.getTitle());
                             UID.setText(event.getUID());
+                            imageButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+
+                                    Uri uri = Uri.parse("https://duPlugin.com/").buildUpon()
+                                            .appendQueryParameter(getString(R.string.DYNAMIC_LINK_TYPE),"events")
+                                            .appendQueryParameter(getString(R.string.DYNAMIC_LINK_UID),event.getUID()).build();
+                                    Task<ShortDynamicLink> shortLinkTask = FirebaseDynamicLinks.getInstance().createDynamicLink()
+                                            .setLink(uri)
+                                            .setDynamicLinkDomain("kys79.app.goo.gl")
+                                            .setAndroidParameters(new DynamicLink.AndroidParameters.Builder().build())
+                                            .setSocialMetaTagParameters(new DynamicLink.SocialMetaTagParameters.Builder()
+                                                    .setTitle(event.getTitle())
+                                                    .setImageUrl(Uri.parse(event.getUrl()))
+                                                    .setDescription(formatDate(event.getTime())+"\n"+fromHtml(event.getVenue()))
+                                                    .build())
+                                            .buildShortDynamicLink()
+                                            .addOnCompleteListener(getActivity(), new OnCompleteListener<ShortDynamicLink>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<ShortDynamicLink> task) {
+                                                    if (task.isSuccessful()) {
+                                                        // Short link created
+                                                        Uri shortLink = task.getResult().getShortLink();
+                                                        Uri flowchartLink = task.getResult().getPreviewLink();
+
+                                                        Intent shareIntent = new Intent();
+                                                        shareIntent.setAction(Intent.ACTION_SEND);
+                                                        shareIntent.setType("text/plain");
+                                                        shareIntent.putExtra(Intent.EXTRA_TEXT,shortLink.toString());
+                                                        startActivity(Intent.createChooser(shareIntent,"Choose"));
+                                                    } else {
+                                                        // Error
+                                                        // ...
+                                                    }
+                                                }
+                                            });
+                                }
+                            });
                             if(!event.getUrl().equals("")) {
                                 Picasso.with(getContext()).load(event.getUrl()).placeholder(R.drawable.event_place_holder)
                                         .fit().centerCrop().into(imageView);
                             }
+
 
                         }
 
@@ -244,16 +298,56 @@ public class EventsHolder extends Fragment {
 
 
                 @Override
-                protected void populateView(View v, Event event, int position) {
+                protected void populateView(View v,final  Event event, int position) {
                     TextView title = (TextView) v.findViewById(R.id.event_title);
                     TextView venue = (TextView) v.findViewById(R.id.event_venue);
                     TextView time = (TextView) v.findViewById(R.id.event_time);
                     TextView UID = (TextView) v.findViewById(R.id.event_UID);
                     ImageView imageView = (ImageView) v.findViewById(R.id.event_image);
                     time.setText(getTimeAgo(getContext(),event.getDate()));
-                    venue.setText(event.getVenue());
-                    title.setText(event.getTitle());
+                    venue.setText(fromHtml(event.getVenue()));
+                    title.setText(fromHtml(event.getTitle()));
                     UID.setText(event.getUID());
+
+                    final ImageButton imageButton = (ImageButton) v.findViewById(R.id.event_shareButton);
+                    imageButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            Uri uri = Uri.parse("https://duPlugin.com/").buildUpon()
+                                    .appendQueryParameter(getString(R.string.DYNAMIC_LINK_TYPE),"events")
+                                    .appendQueryParameter(getString(R.string.DYNAMIC_LINK_UID),event.getUID()).build();
+                            Task<ShortDynamicLink> shortLinkTask = FirebaseDynamicLinks.getInstance().createDynamicLink()
+                                    .setLink(uri)
+                                    .setDynamicLinkDomain("kys79.app.goo.gl")
+                                    .setAndroidParameters(new DynamicLink.AndroidParameters.Builder().build())
+                                    .setSocialMetaTagParameters(new DynamicLink.SocialMetaTagParameters.Builder()
+                                            .setTitle(event.getTitle())
+                                            .setImageUrl(Uri.parse(event.getUrl()))
+                                            .setDescription(formatDate(event.getTime())+"\n"+fromHtml(event.getVenue()))
+                                            .build())
+                                    .buildShortDynamicLink()
+                                    .addOnCompleteListener(getActivity(), new OnCompleteListener<ShortDynamicLink>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<ShortDynamicLink> task) {
+                                            if (task.isSuccessful()) {
+                                                // Short link created
+                                                Uri shortLink = task.getResult().getShortLink();
+                                                Uri flowchartLink = task.getResult().getPreviewLink();
+
+                                                Intent shareIntent = new Intent();
+                                                shareIntent.setAction(Intent.ACTION_SEND);
+                                                shareIntent.setType("text/plain");
+                                                shareIntent.putExtra(Intent.EXTRA_TEXT,shortLink.toString());
+                                                startActivity(Intent.createChooser(shareIntent,"Choose"));
+                                            } else {
+                                                // Error
+                                                // ...
+                                            }
+                                        }
+                                    });
+                        }
+                    });
 
                     if (!event.getUrl().equals("")){
                         Picasso.with(getContext()).load(event.getUrl()).placeholder(R.drawable.event_place_holder)
@@ -319,5 +413,16 @@ public class EventsHolder extends Fragment {
         mListView = null;
         mAdapter.removeListener();
         databaseReference =null;
+    }
+
+    @SuppressWarnings("deprecation")
+    public static Spanned fromHtml(String html){
+        Spanned result;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            result = Html.fromHtml(html,Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            result = Html.fromHtml(html);
+        }
+        return result;
     }
 }

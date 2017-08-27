@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.text.Spanned;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,10 +52,10 @@ public class NoticeDetails extends AppCompatActivity implements BlankFragment.Ph
         viewPager = (CustomViewPager) findViewById(R.id.noticeDetails_viewFlipper);
 
 
-        final TextView title = (TextView) findViewById(R.id.notice_details_title);
+        final TextView title = (TextView) findViewById(R.id.noticeDetails_title);
         final TextView description = (TextView) findViewById(R.id.notice_details_description);
-        final TextView time = (TextView) findViewById(R.id.notice_deatails_time);
-        final TextView deadline = (TextView) findViewById(R.id.notice_details_deadline);
+        final TextView time = (TextView) findViewById(R.id.noticeDetails_time);
+        final TextView deadline = (TextView) findViewById(R.id.noticeDetails_deadline);
         final TextView uid = (TextView) findViewById(R.id.notice_uid);
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Notices")
                 .child(noticeUid);
@@ -83,27 +84,30 @@ public class NoticeDetails extends AppCompatActivity implements BlankFragment.Ph
                 description.setText(fromHtml(notice.getDescription()));
                 time.setText(fromHtml(getTimeAgo(NoticeDetails.this,notice.getTime())));
                 deadline.setText(getTimeAgo(NoticeDetails.this,notice.getDeadline()));
+                imageList = notice.getImageUrls();
 
-                imageList.add("https://pbs.twimg.com/profile_images/604644048/sign051.gif");
-                imageList.add("https://pbs.twimg.com/profile_images/604644048/sign051.gif");
-                Iterator<String> iterator = imageList.iterator();
-                final ArrayList<BlankFragment> fragments = new ArrayList<BlankFragment>();
-                while(iterator.hasNext()){
-                    String photo = iterator.next();
-                    BlankFragment temp = BlankFragment.newInstance(photo);
-                    fragments.add(temp);
+                if(imageList!=null) {
+                    Iterator<String> iterator = imageList.iterator();
+                    final ArrayList<BlankFragment> fragments = new ArrayList<BlankFragment>();
+                    while (iterator.hasNext()) {
+                        String photo = iterator.next();
+                        BlankFragment temp = BlankFragment.newInstance(photo);
+                        fragments.add(temp);
+                    }
+                    viewPager.setAdapter(new FragmentStatePagerAdapter(getSupportFragmentManager()) {
+                        @Override
+                        public Fragment getItem(int position) {
+                            return fragments.get(position);
+                        }
+
+                        @Override
+                        public int getCount() {
+                            return fragments.size();
+                        }
+                    });
+                }else{
+                    viewPager.setVisibility(View.GONE);
                 }
-                viewPager.setAdapter(new FragmentStatePagerAdapter(getSupportFragmentManager()) {
-                    @Override
-                    public Fragment getItem(int position) {
-                        return  fragments.get(position);
-                    }
-
-                    @Override
-                    public int getCount() {
-                        return fragments.size();
-                    }
-                });
 
             }
 
@@ -157,6 +161,7 @@ public class NoticeDetails extends AppCompatActivity implements BlankFragment.Ph
         } else {
             result = Html.fromHtml(html);
         }
+
         return result;
     }
 
@@ -164,9 +169,9 @@ public class NoticeDetails extends AppCompatActivity implements BlankFragment.Ph
     public void onPhotoTap(ImageView view, float x, float y) {
 
 
-//        Intent intent = new Intent(this,ImagePagerActivty.class);
-//        intent.putExtra(ImagePagerActivty.RESOURCE,imageList);
-//        intent.putExtra(ImagePagerActivty.POSITION,viewPager.getCurrentItem());
-//        startActivity(intent);
+        Intent intent = new Intent(this,ImagePagerActivty.class);
+        intent.putExtra(ImagePagerActivty.RESOURCE,imageList);
+        intent.putExtra(ImagePagerActivty.POSITION,viewPager.getCurrentItem());
+        startActivity(intent);
     }
 }

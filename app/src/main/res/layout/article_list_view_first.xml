@@ -21,22 +21,8 @@
         />
 
 
-    <android.support.v7.widget.AppCompatImageButton
-        android:id="@+id/shareArticle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="?android:attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusableInTouchMode="true"
-        android:padding="8dp"
-        app:srcCompat="?android:attr/actionModeShareDrawable"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_margin="20dp"
-        />
-
     <TextView
-        android:id="@+id/notice_details_title"
+        android:id="@+id/noticeDetails_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
@@ -54,15 +40,15 @@
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/notice_details_title"
-        android:layout_below="@+id/notice_details_title"
+        android:layout_alignStart="@+id/noticeDetails_title"
+        android:layout_below="@+id/noticeDetails_title"
         android:layout_marginTop="7dp"
         android:text="DU plugIn"
         android:textSize="12sp"
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/notice_deatails_time"
+        android:id="@+id/noticeDetails_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/textView3"

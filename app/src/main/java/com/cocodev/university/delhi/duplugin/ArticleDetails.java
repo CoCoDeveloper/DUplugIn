@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -11,11 +12,11 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatImageButton;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -37,6 +38,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.dynamiclinks.DynamicLink;
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
+import com.google.firebase.dynamiclinks.ShortDynamicLink;
 import com.squareup.picasso.Picasso;
 
 import static com.cocodev.university.delhi.duplugin.Utility.Utility.getTimeAgo;
@@ -53,6 +57,9 @@ public class ArticleDetails extends AppCompatActivity{
     View mFooterView;
     private DatabaseReference mCommentRefrence;
     private FirebaseListAdapter<Comment> commentAdapter;
+    String title;
+    String imageUrl;
+    String UID;
 
     Button toggleShowHideComments;
 
@@ -61,6 +68,40 @@ public class ArticleDetails extends AppCompatActivity{
         switch (item.getItemId()) {
             case android.R.id.home:
                 onBackPressed();
+                return true;
+            case R.id.action_share:
+
+                Uri uri = Uri.parse("https://duPlugin.com/").buildUpon()
+                        .appendQueryParameter(getString(R.string.DYNAMIC_LINK_TYPE),"article")
+                        .appendQueryParameter(getString(R.string.DYNAMIC_LINK_UID),UID).build();
+                Task<ShortDynamicLink> shortLinkTask = FirebaseDynamicLinks.getInstance().createDynamicLink()
+                        .setLink(uri)
+                        .setDynamicLinkDomain("kys79.app.goo.gl")
+                        .setAndroidParameters(new DynamicLink.AndroidParameters.Builder().build())
+                        .setSocialMetaTagParameters(new DynamicLink.SocialMetaTagParameters.Builder()
+                                .setTitle(title)
+                                .setImageUrl(Uri.parse(imageUrl))
+                                .build())
+                        .buildShortDynamicLink()
+                        .addOnCompleteListener(ArticleDetails.this, new OnCompleteListener<ShortDynamicLink>() {
+                            @Override
+                            public void onComplete(@NonNull Task<ShortDynamicLink> task) {
+                                if (task.isSuccessful()) {
+                                    // Short link created
+                                    Uri shortLink = task.getResult().getShortLink();
+                                    Uri flowchartLink = task.getResult().getPreviewLink();
+
+                                    Intent shareIntent = new Intent();
+                                    shareIntent.setAction(Intent.ACTION_SEND);
+                                    shareIntent.setType("text/plain");
+                                    shareIntent.putExtra(Intent.EXTRA_TEXT,shortLink.toString());
+                                    startActivity(Intent.createChooser(shareIntent,"Choose"));
+                                } else {
+                                    // Error
+                                    // ...
+                                }
+                            }
+                        });
                 return true;
             default:
                 // If we got here, the user's action was not recognized.
@@ -71,12 +112,12 @@ public class ArticleDetails extends AppCompatActivity{
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         supportRequestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article_details);
-        Intent intent = getIntent();
-        final String UID = intent.getStringExtra(key);
+        final Intent intent = getIntent();
+        UID = intent.getStringExtra(key);
         articleUid=UID;
         initActionBar();
 
@@ -86,8 +127,8 @@ public class ArticleDetails extends AppCompatActivity{
 
 
         final ImageView imageView = (ImageView) findViewById(R.id.articleImage);
-        final TextView titleView = (TextView) headerView.findViewById(R.id.notice_details_title);
-        final TextView timeView = (TextView) headerView.findViewById(R.id.notice_deatails_time);
+        final TextView titleView = (TextView) headerView.findViewById(R.id.noticeDetails_title);
+        final TextView timeView = (TextView) headerView.findViewById(R.id.noticeDetails_time);
         final TextView authorView = (TextView) headerView.findViewById(R.id.article_author);
         final TextView descriptionView = (TextView) headerView.findViewById(R.id.notice_details_description);
 
@@ -104,6 +145,7 @@ public class ArticleDetails extends AppCompatActivity{
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 article = dataSnapshot.getValue(Article.class);
+
                 if(article==null) {
                     if(check){
                         check=false;
@@ -113,12 +155,26 @@ public class ArticleDetails extends AppCompatActivity{
                     }
                     return;
                 }
+                title = String.valueOf(fromHtml(article.getTitle()));
+                imageUrl=article.getImageUrl();
+                final String imageUrl = article.getImageUrl();
+
                 timeView.setText(getTimeAgo(ArticleDetails.this,article.getTime()));
                 titleView.setText(fromHtml(article.getTitle()));
                 descriptionView. setMovementMethod(LinkMovementMethod.getInstance());
                 authorView.setText(fromHtml(article.getAuthor()));
                 descriptionView.setText(fromHtml(article.getDescription()));
                 Picasso.with(ArticleDetails.this).load(article.getImageUrl()).fit().into(imageView);
+
+//                appCompatImageButton.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//
+//
+
+//                    }
+//                });
+
             }
 
             @Override
@@ -249,20 +305,13 @@ public class ArticleDetails extends AppCompatActivity{
             }
         });
 
-        AppCompatImageButton appCompatImageButton = (AppCompatImageButton) findViewById(R.id.shareArticle);
-        appCompatImageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(ArticleDetails.this, "clicked", Toast.LENGTH_SHORT).show();
-            }
-        });
 
     }
 
     private void initActionBar() {
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        actionBar.setStackedBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#10000000")));
+        actionBar.setStackedBackgroundDrawable(new ColorDrawable(Color.parseColor("#10000000")));
         actionBar.setTitle("");
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
@@ -295,4 +344,11 @@ public class ArticleDetails extends AppCompatActivity{
         }
         return result;
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.share_menu,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
 }

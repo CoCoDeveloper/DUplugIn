@@ -9,11 +9,10 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.cocodev.duplugin.MainActivity"
+    tools:context="com.cocodev.university.delhi.duplugin.MainActivity"
     tools:showIn="@layout/app_bar_main"
     android:id="@+id/fragment_layout"
     android:background="@null">
-
 
 
 </RelativeLayout>
